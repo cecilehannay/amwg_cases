@@ -1,0 +1,52 @@
+Setting Environment OMP_STACKSIZE=1024M
+Setting Environment TMPDIR=/glade/scratch/hannay
+Setting Environment MPI_TYPE_DEPTH=16
+Setting Environment MPI_IB_CONGESTED=1
+Setting resource.RLIMIT_STACK to  -1 from (-1, -1)
+Generating namelists for /glade/p/cesmdata/cseg/runs/cesm2_0/f.e21.FWscHIST.ne30_L48_BL10_cam6_3_019_plus_CESM2.2.002_zm2_detmods_entr4.hf
+  2021-11-16 11:14:08 atm 
+Create namelist for component cam
+   Calling /glade/work/hannay/cesm_tags/cam6_3_019_plus_CESM2.2/cime_config/buildnml
+CAM namelist copy: file1 /glade/p/cesmdata/cseg/runs/cesm2_0/f.e21.FWscHIST.ne30_L48_BL10_cam6_3_019_plus_CESM2.2.002_zm2_detmods_entr4.hf/Buildconf/camconf/atm_in file2 /glade/scratch/hannay/f.e21.FWscHIST.ne30_L48_BL10_cam6_3_019_plus_CESM2.2.002_zm2_detmods_entr4.hf/run/atm_in 
+  2021-11-16 11:14:08 lnd 
+Create namelist for component clm
+   Calling /glade/work/hannay/cesm_tags/cam6_3_019_plus_CESM2.2/components/clm//cime_config/buildnml
+  2021-11-16 11:14:08 ice 
+Create namelist for component cice
+   Calling /glade/work/hannay/cesm_tags/cam6_3_019_plus_CESM2.2/components/cice//cime_config/buildnml
+  2021-11-16 11:14:09 ocn 
+Create namelist for component docn
+   Calling /glade/work/hannay/cesm_tags/cam6_3_019_plus_CESM2.2/cime/src/components/data_comps_mct/docn/cime_config/buildnml
+  2021-11-16 11:14:09 rof 
+Create namelist for component mosart
+   Calling /glade/work/hannay/cesm_tags/cam6_3_019_plus_CESM2.2/components/mosart//cime_config/buildnml
+  2021-11-16 11:14:09 glc 
+Create namelist for component cism
+   Running /glade/work/hannay/cesm_tags/cam6_3_019_plus_CESM2.2/components/cism//cime_config/buildnml 
+  2021-11-16 11:14:11 wav 
+Create namelist for component swav
+   Calling /glade/work/hannay/cesm_tags/cam6_3_019_plus_CESM2.2/cime/src/components/stub_comps_mct/swav/cime_config/buildnml
+  2021-11-16 11:14:11 iac 
+Create namelist for component siac
+   Running /glade/work/hannay/cesm_tags/cam6_3_019_plus_CESM2.2/cime/src/components/stub_comps_mct/siac/cime_config/buildnml 
+  2021-11-16 11:14:11 esp 
+Create namelist for component sesp
+   Calling /glade/work/hannay/cesm_tags/cam6_3_019_plus_CESM2.2/cime/src/components/stub_comps_mct/sesp/cime_config/buildnml
+  2021-11-16 11:14:11 cpl 
+Create namelist for component drv
+   Calling /glade/work/hannay/cesm_tags/cam6_3_019_plus_CESM2.2/cime/src/drivers/mct/cime_config/buildnml
+   NOTE: ignoring setting of rof2ocn_liq_rmapname=idmap in seq_maps.rc
+   NOTE: ignoring setting of rof2ocn_fmapname=idmap in seq_maps.rc
+   NOTE: ignoring setting of rof2ocn_ice_rmapname=idmap in seq_maps.rc
+-------------------------------------------------------------------------
+ - Prestage required restarts into /glade/scratch/hannay/f.e21.FWscHIST.ne30_L48_BL10_cam6_3_019_plus_CESM2.2.002_zm2_detmods_entr4.hf/run
+ - Case input data directory (DIN_LOC_ROOT) is /glade/p/cesmdata/cseg/inputdata 
+ - Checking for required input datasets in DIN_LOC_ROOT
+-------------------------------------------------------------------------
+run command is mpiexec_mpt -p "%g:"  -np 2160  omplace -tm open64  /glade/scratch/hannay/f.e21.FWscHIST.ne30_L48_BL10_cam6_3_019_plus_CESM2.2.002_zm2_detmods_entr4.hf/bld/cesm.exe   >> cesm.log.$LID 2>&1  
+adays = 365.0 nsteps 17520 tlen 1.0 ncpl 48 nprocs 2160
+HERE adays 365 tmax 11338.583
+check for resubmit
+dout_s True 
+mach cheyenne 
+resubmit_num 4
