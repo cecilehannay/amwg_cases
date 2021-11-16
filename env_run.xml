@@ -233,7 +233,7 @@
       Set to TRUE when continuing a run.
     </desc>
     </entry>
-    <entry id="RESUBMIT" value="3">
+    <entry id="RESUBMIT" value="0">
       <type>integer</type>
       <desc>If RESUBMIT is greater than 0, then case will automatically resubmit
     Enables the model to automatically resubmit a new run.  To get
@@ -253,7 +253,7 @@
       timing tests.
     </desc>
     </entry>
-    <entry id="JOB_IDS" value="case.run:1490424.chadmin1.ib0.cheyenne.ucar.edu, case.st_archive:1490425.chadmin1.ib0.cheyenne.ucar.edu">
+    <entry id="JOB_IDS" value="case.run:1487552.chadmin1.ib0.cheyenne.ucar.edu, case.st_archive:1487554.chadmin1.ib0.cheyenne.ucar.edu">
       <type>char</type>
       <desc>List of job ids for most recent case.submit</desc>
     </entry>

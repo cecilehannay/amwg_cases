@@ -2806,11 +2806,6 @@ subroutine cldprp(lchnk   , &
    real(r8) grav                 ! gravity
    real(r8) cp                   ! heat capacity of dry air
 
- !+tht 10.11.2021
-   real(r8) dzdet(pcols)
-   integer  nldet(pcols)
- !-tht 10.11.2021
-
 !
 ! Local workspace 
 !
@@ -3148,10 +3143,7 @@ subroutine cldprp(lchnk   , &
                      5._r8*i2(i,k)**3+k1(i,k)**2*i4(i,k))/ &
                      k1(i,k)**3*ftemp(i)**4
             f(i,k) = max(f(i,k),0._r8)
-!+++ARH crank up the maximum entrainment rate in the ensemble
-            !f(i,k) = min(f(i,k),0.0002_r8)
-            f(i,k) = min(f(i,k),0.0004_r8)
-!---ARH
+            f(i,k) = min(f(i,k),0.0002_r8)
          end if
       end do
    end do
@@ -3298,46 +3290,23 @@ subroutine cldprp(lchnk   , &
       end do
 
       if (iter == 1)  jto(:) = jt(:)
-!+tht 10/11/2021
-      dzdet(:)=0._r8
-      nldet(:)=0
+
       do k = pver,msg + 1,-1
          do i = 1,il2g
             if (k >= lel(i) .and. k <= jt(i) .and. eps0(i) > 0._r8) then
-              dzdet(i)=dzdet(i)+dz(i,k)
-              nldet(i)=nldet(i)+1
-            endif
-         enddo
-     enddo
-     do k = pver,msg + 1,-1
-         do i = 1,il2g
-            if (k >= lel(i) .and. k <= jt(i) .and. eps0(i) > 0._r8) then
-               du(i,k) = mu(i,jt(i)+1)/dzdet(i)
-               mu(i,k) = mu(i,jt(i)+1)*(k-lel(i))/nldet(i)
+               mu(i,k) = 0._r8
                eu(i,k) = 0._r8
- !             hu(i,k) = hmn(i,k) !tht 12/11/2021: this line may be left out!
+               du(i,k) = 0._r8
+               hu(i,k) = hmn(i,k)
             end if
-         enddo
-     enddo
-
- !    do k = pver,msg + 1,-1
- !       do i = 1,il2g
- !!         if (k >= lel(i) .and. k <= jt(i) .and. eps0(i) > 0._r8) then
- !          if (k >= lel(i) .and. k <  jt(i) .and. eps0(i) > 0._r8) then !arh for clarity
- !             mu(i,k) = 0._r8
- !             eu(i,k) = 0._r8
- !             du(i,k) = 0._r8
- !             hu(i,k) = hmn(i,k)
- !          end if
- !          if (k == jt(i) .and. eps0(i) > 0._r8) then
- !             du(i,k) = mu(i,k+1)/dz(i,k) !tht: k+1
- !             eu(i,k) = 0._r8
- !             mu(i,k) = 0._r8             !tht: k --> ok (arh) 
- !          end if
- !       end do
- !    end do
-!-tht 10/11/2021
-
+            if (k == jt(i) .and. eps0(i) > 0._r8) then
+               du(i,k) = mu(i,k+1)/dz(i,k)
+               eu(i,k) = 0._r8
+               mu(i,k) = 0._r8
+            end if
+         end do
+      end do
+ 
       do i = 1,il2g
          done(i) = .false.
       end do
@@ -3348,9 +3317,7 @@ subroutine cldprp(lchnk   , &
                qu(i,k) = q(i,mx(i))
                su(i,k) = (hu(i,k)-rl*qu(i,k))/cp
             end if
- !tht 11/11/2021 extend plumes to lel (detrainment only between jt and lel)
-           !if (( .not. done(i) .and. k > jt(i) .and. k < jb(i)) .and. eps0(i) > 0._r8) then
-            if (( .not. done(i) .and. k >lel(i) .and. k < jb(i)) .and. eps0(i) > 0._r8) then
+            if (( .not. done(i) .and. k > jt(i) .and. k < jb(i)) .and. eps0(i) > 0._r8) then
                su(i,k) = mu(i,k+1)/mu(i,k)*su(i,k+1) + &
                          dz(i,k)/mu(i,k)* (eu(i,k)-du(i,k))*s(i,k)
                qu(i,k) = mu(i,k+1)/mu(i,k)*qu(i,k+1) + dz(i,k)/mu(i,k)* (eu(i,k)*q(i,k)- &
@@ -3369,9 +3336,7 @@ subroutine cldprp(lchnk   , &
 690   continue
       do k = msg + 2,pver
          do i = 1,il2g
- !tht 11/11/2021 extend plumes to lel (detrainment only between jt and lel)
-           !if ((k > jt(i) .and. k <= jlcl(i)) .and. eps0(i) > 0._r8) then
-            if ((k >lel(i) .and. k <= jlcl(i)) .and. eps0(i) > 0._r8) then
+            if ((k > jt(i) .and. k <= jlcl(i)) .and. eps0(i) > 0._r8) then
                su(i,k) = shat(i,k) + (hu(i,k)-hsthat(i,k))/(cp* (1._r8+gamhat(i,k)))
                qu(i,k) = qsthat(i,k) + gamhat(i,k)*(hu(i,k)-hsthat(i,k))/ &
                         (rl* (1._r8+gamhat(i,k)))
@@ -3506,9 +3471,7 @@ subroutine cldprp(lchnk   , &
          do k = pver,msg + 2,-1
             do i = 1,il2g
                rprd(i,k) = 0._r8
- !tht 11/11/2021 extend plumes to lel (detrainment only between jt and lel)
-              !if (k >= jt(i) .and. k < jb(i) .and. eps0(i) > 0._r8 .and. mu(i,k) >= 0.0_r8) then
-               if (k >=lel(i) .and. k < jb(i) .and. eps0(i) > 0._r8 .and. mu(i,k) >= 0.0_r8) then
+               if (k >= jt(i) .and. k < jb(i) .and. eps0(i) > 0._r8 .and. mu(i,k) >= 0.0_r8) then
                   if (mu(i,k) > 0._r8) then
                      ql1 = 1._r8/mu(i,k)* (mu(i,k+1)*ql(i,k+1)- &
                            dz(i,k)*du(i,k)*ql(i,k+1)+dz(i,k)*cu(i,k))
@@ -3544,9 +3507,7 @@ subroutine cldprp(lchnk   , &
 ! in normal downdraft strength run alfa=0.2.  In test4 alfa=0.1
 !
       alfa(i) = 0.1_r8
- !tht 11/11/2021 extend plumes to lel (detrainment only between jt and lel)
-     !jt(i) = min(jt(i),jb(i)-1)
-      jt(i) = min(lel(i),jb(i)-1)
+      jt(i) = min(jt(i),jb(i)-1)
       jd(i) = max(j0(i),jt(i)+1)
       jd(i) = min(jd(i),jb(i))
       hd(i,jd(i)) = hmn(i,jd(i)-1)
@@ -4244,7 +4205,7 @@ subroutine buoyan_dilute(lchnk   ,ncol    , &
    w_nrg(:ncol,:) = -r_universal*t(:ncol,:)*omega(:ncol,:)/(grav*100._r8*p(:ncol,:))  
 
    lparcel_pbl = .true.   ! Mix parcel properties and level accoring to a mixing length (PBLH mainly)
-   lparcel_dynamic = .false.   ! Enable assumed dynamics of aparcel for buoy. profile and cloud top
+   lparcel_dynamic = .true.   ! Enable assumed dynamics of aparcel for buoy. profile and cloud top
 
 
    
@@ -4422,33 +4383,47 @@ end if ! Mixed parcel properties
 ! -Increments KE base on buoyancy conversion with pe2ke efficiency
 ! -Parcel terminates at level of zero energy   
 
- 
-   
-   if (lparcel_dynamic) then ! Calculate dynamic parcel energy?
-      
+ if (lparcel_dynamic) then ! Calculate dynamic parcel energy?                                                                                                                                                                                                           
+
       do k = pver, msg + 2, -1
          do i = 1,ncol
             if (k == mx(i)) then
                plev_ke(i,k) = pini_ke
             end if
             if (k < mx(i).and.plge600(i)) then
-               plev_ke(i,k) = plev_ke(i,k) + pe2ke_eff*rd*buoy(i,k)*log(pf(i,k+1)/pf(i,k)) + 0.5_r8*w_nrg(i,k)*w_nrg(i,k)
+               plev_ke(i,k) = plev_ke(i,k+1) + pe2ke_eff*rd*buoy(i,k)*log(pf(i,k+1)/pf(i,k)) + 0.5*w_nrg(i,k)*w_nrg(i,k)                                                                                                                                                 
                w_incld(i,k) = sqrt(max(0._r8,2._r8*plev_ke(i,k)))
-               if (plev_ke(i,k) <= 0._r8 .and. first_kelt0(i)) then ! Parcel terminates at level of zero energy
-                  knt(i) = min(num_cin,knt(i) + 1)
-                  lelten(i,knt(i)) = k
-                  first_kelt0(i) = .False. ! Make sure that this bit of code cannot be used once ke<0.
-               end if
+               if (plev_ke(i,k) <= 0._r8 .and. first_kelt0(i)) then ! Parcel terminates at level of zero energy                                                                                                                                                          
+                  knt(i) = 1 ! This is regardless of num_cin (integer)                                                                                                                                                                                                   
+                  lelten(i,1) = k
+                  first_kelt0(i) = .False. ! Make sure that this bit of code cannot be used once ke<0.                                                                                                                                                                   
+              end if
             end if
          end do
       end do
-      
-   else ! Or default parcel energy.
- 
- ! Default way to determine plume top
- ! -Calculated top to bottom
- ! -Starts at LCL
+
+!                                                                                                                                                                                                                                                                       
+! calculate convective available potential energy (cape).                                                                                                                                                                                                               
+! INCLUDE Negative CAPE for CAM6 default calculation                                                                                                                                                                                                                     
+!                                                                                                                                                                                                                                                                        
+      do n = 1,num_cin
+         do k = msg + 1,pver
+            do i = 1,ncol
+               if (plge600(i) .and. k <= mx(i) .and. k > lelten(i,n)) then                                                                                                                                                                                           
+                 capeten(i,n) = capeten(i,n) + rd*buoy(i,k)*log(pf(i,k+1)/pf(i,k))                                                                                                                                                                                    
+                end if
+            end do
+         end do
+      end do
+
+
+
+   else ! Or default parcel energy.      
    
+ ! Default way to determine plume top                                                                                                                                                                                                                              
+ ! -Calculated top to bottom                                                                                                                                                                                                                                             
+ ! -Starts at LCL                                                                                                                                                                                                                                                       
+
       do k = msg + 2,pver
          do i = 1,ncol
             if (k < lcl(i) .and. plge600(i)) then
@@ -4459,24 +4434,33 @@ end if ! Mixed parcel properties
             end if
          end do
       end do
-      
-     
-   end if ! End dynamic parcel logic
-   
-   
-   
-!
-! calculate convective available potential energy (cape).
-!
-   do n = 1,num_cin
-      do k = msg + 1,pver
-         do i = 1,ncol
-            if (plge600(i) .and. k <= mx(i) .and. k > lelten(i,n)) then
-               capeten(i,n) = capeten(i,n) + rd*buoy(i,k)*log(pf(i,k+1)/pf(i,k))
-            end if
+
+!                                                                                                                                                                                                                                                                        
+! calculate convective available potential energy (cape).                                                                                                                                                                                                                
+! EXCLUDE -ve CAPE for dynamic parcel calculation.                                                                                                                                                                                                                       
+!                                                                                                                                                                                                                                                                       
+  
+      do n = 1,num_cin
+         do k = msg + 1,pver
+            do i = 1,ncol
+               if (plge600(i) .and. k <= mx(i) .and. k > lelten(i,n) .and. buoy(i,k) > 0) then                                                                                                                                                                          
+  
+                  capeten(i,n) = capeten(i,n) + rd*buoy(i,k)*log(pf(i,k+1)/pf(i,k))                                                                                                                                                                                      
+               end if
+            end do
          end do
       end do
-   end do
+
+!!                                                                                                                                                                                                                                                                      
+  
+
+   end if ! End dynamic parcel logic                                                                                                                                                                                                                                    
+  
+!!!!!
+!!!!!                                                                                                                                                                                                                                                                   
+    
+   
+
 !
 ! find maximum cape from all possible tentative capes from
 ! one sounding,
@@ -4502,8 +4486,8 @@ end if ! Mixed parcel properties
          end do
       end do
  
-      write(iulog,*)'WMINCLD =',wm_incld
-      write(iulog,*)'MINCLD =',w_incld
+!      write(iulog,*)'WMINCLD =',wm_incld
+!      write(iulog,*)'MINCLD =',w_incld
 
    end if
 
